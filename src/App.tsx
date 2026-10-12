@@ -1,9 +1,60 @@
 import { useEffect, useState } from "react";
 import { RadarChart } from "./components/RadarChart";
 import { channels, scores, shapes, stageMeta, stages, strategyProfiles } from "./data";
-import type { ChannelKey, ShapeId, StageId } from "./types";
+import type { ChannelKey, ChannelScores, ShapeId, StageId } from "./types";
 
 type Step = 1 | 2 | 3;
+
+const EMPTY_SCORES: ChannelScores = {
+  content: 0,
+  website: 0,
+  seo: 0,
+  paid: 0,
+  email: 0,
+};
+
+/** A score of 100 takes this long. Smaller scores finish sooner. */
+const FULL_SCALE_MS = 1200;
+
+function useCountUp(active: boolean, targets: ChannelScores | null) {
+  const [shown, setShown] = useState<ChannelScores>(EMPTY_SCORES);
+
+  useEffect(() => {
+    if (!active || !targets) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setShown(targets);
+      return;
+    }
+
+    const keys = Object.keys(targets) as ChannelKey[];
+    const pointsPerMs = 100 / FULL_SCALE_MS;
+    const longest = keys.reduce(
+      (max, key) => Math.max(max, targets[key] / pointsPerMs),
+      0
+    );
+    const start = performance.now();
+    let frame = 0;
+
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const grown = elapsed * pointsPerMs;
+      const next = { ...EMPTY_SCORES };
+      for (const key of keys) {
+        next[key] = Math.min(targets[key], grown);
+      }
+      setShown(next);
+      if (elapsed < longest) frame = requestAnimationFrame(tick);
+    };
+
+    setShown(EMPTY_SCORES);
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [active, targets]);
+
+  return shown;
+}
 
 function topChannel(shape: ShapeId, stage: StageId): ChannelKey {
   const values = scores[shape][stage];
@@ -36,6 +87,7 @@ export default function App() {
   const current = ready ? scores[shape][stage] : null;
   const priority = ready ? topChannel(shape, stage) : null;
   const priorityLabel = channels.find((channel) => channel.key === priority)?.label;
+  const shown = useCountUp(step === 3 && ready, current);
 
   return (
     <main className="app">
@@ -124,16 +176,16 @@ export default function App() {
           </header>
 
           <div className="diagnostic">
-            <RadarChart scores={current} topChannel={priority} />
+            <RadarChart scores={shown} topChannel={priority} />
             <div className="score-list">
               {channels.map((channel) => (
                 <div key={channel.key} className="score-row">
                   <div className="score-line">
                     <span>{channel.label}</span>
-                    <strong>{current[channel.key]}</strong>
+                    <strong>{Math.round(shown[channel.key])}</strong>
                   </div>
                   <div className="score-track">
-                    <span style={{ width: `${current[channel.key]}%` }} />
+                    <span style={{ width: `${shown[channel.key]}%` }} />
                   </div>
                 </div>
               ))}
@@ -142,7 +194,7 @@ export default function App() {
                   <p>Priority Channel</p>
                   <strong>{priorityLabel}</strong>
                 </div>
-                <b>{current[priority]}</b>
+                <b>{Math.round(shown[priority])}</b>
               </div>
             </div>
           </div>

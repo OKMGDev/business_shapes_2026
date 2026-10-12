@@ -185,17 +185,17 @@ h1 {
 
 .diagnostic {
   display: grid;
-  grid-template-columns: minmax(280px, 0.9fr) minmax(280px, 1.1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.85fr);
   align-items: center;
-  gap: 12px 28px;
-  margin-top: 34px;
-  padding: 28px 8px 18px 0;
+  gap: 8px 20px;
+  margin-top: 28px;
+  padding: 12px 0 18px;
   background: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0) 100%);
 }
 
 .radar {
   width: 100%;
-  max-width: 320px;
+  max-width: 520px;
   height: auto;
   overflow: visible;
   justify-self: center;
@@ -210,16 +210,17 @@ h1 {
 
 .radar-score {
   font-family: "DM Sans", sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.12px;
+  font-variant-numeric: tabular-nums;
   fill: #101010;
 }
 
 .score-list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
   min-width: 0;
 }
 
@@ -228,26 +229,31 @@ h1 {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.4;
   letter-spacing: -0.17px;
 }
 
+.score-line strong,
+.priority b {
+  font-variant-numeric: tabular-nums;
+}
+
 .score-line strong {
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 700;
 }
 
 .score-track {
-  height: 4px;
-  margin-top: 6px;
+  height: 10px;
+  margin-top: 8px;
   background: #dedede;
   overflow: hidden;
 }
 
 .score-track span {
   display: block;
-  height: 4px;
+  height: 10px;
   background: #101010;
 }
 
@@ -273,8 +279,8 @@ h1 {
 }
 
 .priority b {
-  font-size: 29px;
-  line-height: 1.25;
+  font-size: 36px;
+  line-height: 1.1;
   font-weight: 700;
 }
 

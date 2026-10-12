@@ -1,10 +1,10 @@
 import { channels, radarOrder } from "../data";
 import type { ChannelKey, ChannelScores } from "../types";
 
-const SIZE = 300;
+const SIZE = 340;
 const CENTER = SIZE / 2;
-const RADIUS = 92;
-const PAD = 72;
+const RADIUS = 128;
+const PAD = 78;
 const AXES = radarOrder.length;
 
 function point(index: number, radius: number): [number, number] {
@@ -103,8 +103,8 @@ export function RadarChart({ scores, topChannel }: RadarChartProps) {
             >
               {label}
             </text>
-            <text x={x} y={y + 10} textAnchor={anchor} className="radar-score">
-              {scores[key]}
+            <text x={x} y={y + 12} textAnchor={anchor} className="radar-score">
+              {Math.round(scores[key])}
             </text>
           </g>
         );
